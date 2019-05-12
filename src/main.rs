@@ -5,7 +5,7 @@ extern crate serde_json;
 
 use lambda::{lambda, Context, error::HandlerError};
 use alexa_sdk::{Request,Response};
-use alexa_sdk::request::{IntentType, Locale};
+use alexa_sdk::request::{IntentType};
 use std::error::Error;
 use std::io::Read;
 use serde::{Deserialize, Serialize};
@@ -89,7 +89,15 @@ struct Root<'a> {
     message: &'a str
 }
 
-//https://api.bart.gov/api/version.aspx?key=MW9S-E7SL-26DU-VV8V&json=y
+//#[derive(Deserialize, Serialize)]
+//struct Fare<'a> {
+//    #[serde(borrow)]
+//    xml: Xml<'a>,
+//
+//
+//}
+
+
 
 fn http_get(url: &str) -> reqwest::Result<String> {
     let mut response = reqwest::get(url)?;
@@ -101,7 +109,13 @@ fn http_get(url: &str) -> reqwest::Result<String> {
 }
 
 fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
-    Ok(Response::new_simple("hello", "to say hello, tell me: say hello to someone"))
+    Ok(
+        Response::new_simple(
+            "Usage Help",
+            "To get information about BART service advisories and alerts, say:\
+            Alexa, ask BART info for updates."
+        )
+    )
 }
 
 fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError> {
@@ -119,10 +133,12 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
         response_buffer.push_str(response);
     }
 
-    Ok(Response::new_simple(
-        "Service Advisories",
-        &response_buffer[..]
-    ))
+    Ok(
+        Response::new_simple(
+            "Service Advisories",
+            &response_buffer[..]
+        )
+    )
 }
 
 fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
