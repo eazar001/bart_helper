@@ -104,37 +104,18 @@ fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(Response::new_simple("hello", "to say hello, tell me: say hello to someone"))
 }
 
-fn handle_hello(req: &Request) -> std::result::Result<Response,HandlerError> {
-    let answer = http_get("https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=MW9S-E7SL-26DU-VV8V&json=y");
-    println!("{}", answer.unwrap());
-
-    let res = match req.intent() {
-        _ => if let Some(ref s) = req.slot_value("name") {
-            Response::new_simple("hello", (String::from("hello ") + s).as_str())
-        } else {
-            Response::new_simple("hello", "hello world")
-        },
-    };
-    Ok(res)
-}
-
-fn handle_advisory() -> std::result::Result<Response,HandlerError> {
+fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError> {
     let payload_text = http_get(
         "https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=MW9S-E7SL-26DU-VV8V&json=y"
     );
 
     let s = &payload_text.unwrap()[..];
-//    println!(s);
 
     let bsa: Result<Bsa> = serde_json::from_str(s);
-    let mut responses = Vec::new();
     let mut response_buffer = String::new();
 
     for e in bsa.unwrap().root.payload {
-        responses.push(e.description.cdata);
-    }
-
-    for response in responses {
+        let response = e.description.cdata;
         response_buffer.push_str(response);
     }
 
@@ -154,7 +135,7 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerE
         IntentType::Help => handle_help(&req),
         IntentType::User(s) =>
             match &s[..] {
-                "advisory" => handle_advisory(),
+                "advisory" => handle_advisory(&req),
                 _ => handle_cancel(&req)
             }
         _ => handle_cancel(&req)
