@@ -3,6 +3,8 @@ extern crate alexa_sdk;
 extern crate reqwest;
 extern crate serde_json;
 
+mod bart_response;
+
 use lambda::{lambda, Context, error::HandlerError};
 use alexa_sdk::{Request,Response};
 use alexa_sdk::request::{IntentType};
@@ -10,92 +12,6 @@ use std::error::Error;
 use std::io::Read;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value};
-
-
-#[derive(Deserialize, Serialize)]
-struct Bsa<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "?xml")]
-    xml: Xml<'a>,
-
-    #[serde(borrow)]
-    root: Root<'a>
-}
-
-#[derive(Deserialize, Serialize)]
-struct Xml<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "@version")]
-    version: &'a str,
-
-    #[serde(borrow)]
-    #[serde(rename = "@encoding")]
-    encoding: &'a str
-}
-
-#[derive(Deserialize, Serialize)]
-struct Msg<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "#cdata-section")]
-    cdata: &'a str
-}
-
-#[derive(Deserialize, Serialize)]
-struct BsaPayload<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "@id")]
-    id: &'a str,
-
-    #[serde(borrow)]
-    station: &'a str,
-
-    #[serde(borrow)]
-    #[serde(rename = "type")]
-    advisory_type: &'a str,
-
-    #[serde(borrow)]
-    description: Msg<'a>,
-
-    #[serde(borrow)]
-    sms_text: Msg<'a>,
-
-    #[serde(borrow)]
-    posted: &'a str,
-
-    #[serde(borrow)]
-    expires: &'a str
-}
-
-#[derive(Deserialize, Serialize)]
-struct Root<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "@id")]
-    id: &'a str,
-
-    #[serde(borrow)]
-    uri: Msg<'a>,
-
-    #[serde(borrow)]
-    date: &'a str,
-
-    #[serde(borrow)]
-    time: &'a str,
-
-    #[serde(borrow)]
-    #[serde(rename = "bsa")]
-    payload: Vec<BsaPayload<'a>>,
-
-    #[serde(borrow)]
-    message: &'a str
-}
-
-//#[derive(Deserialize, Serialize)]
-//struct Fare<'a> {
-//    #[serde(borrow)]
-//    xml: Xml<'a>,
-//
-//
-//}
 
 
 
@@ -125,7 +41,7 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
 
     let s = &payload_text.unwrap()[..];
 
-    let bsa: Result<Bsa> = serde_json::from_str(s);
+    let bsa: Result<bart_response::bsa::Response> = serde_json::from_str(s);
     let mut response_buffer = String::new();
 
     for e in bsa.unwrap().root.payload {
