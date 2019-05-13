@@ -1,9 +1,6 @@
-extern crate alexa_sdk;
 extern crate serde_json;
 
-use lambda::{lambda, Context, error::HandlerError};
 use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value};
 
 
 #[derive(Deserialize, Serialize)]
