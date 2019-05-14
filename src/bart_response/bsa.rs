@@ -3,7 +3,7 @@ extern crate serde_json;
 use serde::{Deserialize, Serialize};
 
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Response<'a> {
     #[serde(borrow)]
     #[serde(rename = "?xml")]
@@ -13,7 +13,7 @@ pub struct Response<'a> {
     pub root: Root<'a>
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Xml<'a> {
     #[serde(borrow)]
     #[serde(rename = "@version")]
@@ -24,25 +24,25 @@ pub struct Xml<'a> {
     encoding: &'a str
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Msg<'a> {
     #[serde(borrow)]
     #[serde(rename = "#cdata-section")]
     pub cdata: &'a str
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct BsaPayload<'a> {
     #[serde(borrow)]
     #[serde(rename = "@id")]
-    id: &'a str,
+    id: Option<&'a str>,
 
     #[serde(borrow)]
     station: &'a str,
 
     #[serde(borrow)]
     #[serde(rename = "type")]
-    advisory_type: &'a str,
+    advisory_type: Option<&'a str>,
 
     #[serde(borrow)]
     pub description: Msg<'a>,
@@ -51,13 +51,13 @@ pub struct BsaPayload<'a> {
     sms_text: Msg<'a>,
 
     #[serde(borrow)]
-    posted: &'a str,
+    posted: Option<&'a str>,
 
     #[serde(borrow)]
-    expires: &'a str
+    expires: Option<&'a str>
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Root<'a> {
     #[serde(borrow)]
     #[serde(rename = "@id")]
