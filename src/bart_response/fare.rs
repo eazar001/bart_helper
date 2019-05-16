@@ -29,50 +29,77 @@ pub struct Msg<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct BsaPayload<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "@id")]
-    id: Option<&'a str>,
-
-    #[serde(borrow)]
-    station: &'a str,
-
-    #[serde(borrow)]
-    #[serde(rename = "type")]
-    advisory_type: Option<&'a str>,
-
-    #[serde(borrow)]
-    pub description: Msg<'a>,
-
-    #[serde(borrow)]
-    sms_text: Msg<'a>,
-
-    #[serde(borrow)]
-    posted: Option<&'a str>,
-
-    #[serde(borrow)]
-    expires: Option<&'a str>
-}
-
-#[derive(Deserialize, Serialize, Debug)]
 pub struct Root<'a> {
-    #[serde(borrow)]
-    #[serde(rename = "@id")]
-    id: &'a str,
 
     #[serde(borrow)]
     uri: Msg<'a>,
 
     #[serde(borrow)]
-    date: &'a str,
+    origin: &'a str,
 
     #[serde(borrow)]
-    time: &'a str,
+    destination: &'a str,
 
     #[serde(borrow)]
-    #[serde(rename = "bsa")]
-    pub payload: Vec<BsaPayload<'a>>,
+    sched_num: &'a str,
 
     #[serde(borrow)]
-    message: &'a str
+    trip: Trip<'a>,
+
+    #[serde(borrow)]
+    #[serde(rename = "fares")]
+    pub fares: Fares<'a>,
+
+    #[serde(borrow)]
+    message: Message<'a>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Fares<'a> {
+
+    #[serde(borrow)]
+    level: &'a str,
+
+    #[serde(borrow)]
+    #[serde(rename = "fare")]
+    payload: Vec<FarePayLoad<'a>>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct FarePayLoad<'a> {
+
+    #[serde(borrow)]
+    #[serde(rename = "@amount")]
+    amount: &'a str,
+
+    #[serde(borrow)]
+    #[serde(rename = "@class")]
+    class: &'a str,
+
+    #[serde(borrow)]
+    #[serde(rename = "@name")]
+    name: &'a str
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Trip<'a> {
+
+    #[serde(borrow)]
+    fare: &'a str,
+
+    #[serde(borrow)]
+    discount: Discount<'a>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Discount<'a> {
+
+    #[serde(borrow)]
+    clipper: &'a str
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Message<'a> {
+    #[serde(borrow)]
+    co2_emissions: Msg<'a>
 }

@@ -1,11 +1,7 @@
-extern crate lambda_runtime as lambda;
-extern crate alexa_sdk;
-extern crate reqwest;
-extern crate serde_json;
-
 mod bart_response;
 
-use lambda::{lambda, Context, error::HandlerError};
+use lambda_runtime as lambda;
+use self::lambda::{lambda, Context, error::HandlerError};
 use alexa_sdk::{Request,Response};
 use alexa_sdk::request::{IntentType};
 use std::error::Error;
