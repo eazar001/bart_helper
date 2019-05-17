@@ -53,6 +53,31 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
     )
 }
 
+fn handle_fare(_req: &Request) -> std::result::Result<Response,HandlerError> {
+    let payload_text = http_get(
+        "https://api.bart.gov/api/sched.aspx?cmd=fare&orig=12th&dest=embr&date=today&key=MW9S-E7SL-26DU-VV8V&json=y"
+    );
+
+    let s= &payload_text.unwrap()[..];
+    let fare: Result<bart_response::fare::Response> = serde_json::from_str(s);
+    let mut response_buffer = String::new();
+
+    for e in fare.unwrap().root.fares.payload {
+        let response = e.amount;
+//        response_buffer.push_str(response);
+        response_buffer.push_str(response);
+        break;
+    }
+
+    Ok(
+        Response::new_simple(
+            "Fares",
+            &response_buffer[..]
+        )
+    )
+
+}
+
 fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(Response::end())
 }
@@ -64,6 +89,7 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerE
         IntentType::User(s) =>
             match &s[..] {
                 "advisory" => handle_advisory(&req),
+                "fare" => handle_fare(&req),
                 _ => handle_cancel(&req)
             }
         _ => handle_cancel(&req)

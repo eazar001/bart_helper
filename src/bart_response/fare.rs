@@ -22,17 +22,16 @@ pub struct Xml<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Msg<'a> {
-    #[serde(borrow)]
+pub struct Msg {
+
     #[serde(rename = "#cdata-section")]
-    pub cdata: &'a str
+    pub cdata: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Root<'a> {
 
-    #[serde(borrow)]
-    uri: Msg<'a>,
+    uri: Msg,
 
     #[serde(borrow)]
     origin: &'a str,
@@ -50,19 +49,19 @@ pub struct Root<'a> {
     #[serde(rename = "fares")]
     pub fares: Fares<'a>,
 
-    #[serde(borrow)]
-    message: Message<'a>
+    message: Message
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Fares<'a> {
 
     #[serde(borrow)]
+    #[serde(rename = "@level")]
     level: &'a str,
 
     #[serde(borrow)]
     #[serde(rename = "fare")]
-    payload: Vec<FarePayLoad<'a>>
+    pub payload: Vec<FarePayLoad<'a>>
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -70,7 +69,7 @@ pub struct FarePayLoad<'a> {
 
     #[serde(borrow)]
     #[serde(rename = "@amount")]
-    amount: &'a str,
+    pub amount: &'a str,
 
     #[serde(borrow)]
     #[serde(rename = "@class")]
@@ -99,7 +98,7 @@ pub struct Discount<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Message<'a> {
-    #[serde(borrow)]
-    co2_emissions: Msg<'a>
+pub struct Message {
+
+    co2_emissions: Msg
 }
