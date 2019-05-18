@@ -7,6 +7,8 @@ use alexa_sdk::request::{IntentType};
 use std::error::Error;
 use std::io::Read;
 use std::collections::HashMap;
+use regex::RegexSet;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value};
 use std::hash::Hash;
@@ -108,8 +110,14 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
 }
 
 fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Result<Response,HandlerError> {
-    let origin_key = req.slot_value("origin").unwrap().to_lowercase();
-    let dest_key = req.slot_value("dest").unwrap().to_lowercase();
+    let daily_re = Regex::new(r"(daily) ").unwrap();
+
+
+    let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
+    let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
+
+    let origin_key = daily_re.replace_all(&origin_lower, "daly ");
+    let dest_key = daily_re.replace_all(&dest_lower, "daly ");
 
     let origin = stations.get(&origin_key[..]).unwrap();
     let dest = stations.get(&dest_key[..]).unwrap();
