@@ -12,6 +12,59 @@ use serde_json::{Result, Value};
 use std::hash::Hash;
 
 
+fn stations() -> HashMap<&'static str, &'static str> {
+    [
+        ("twelfth street oakland city center", "12th"),
+        ("sixteenth street Mission", "16th"),
+        ("nineteenth street oakland", "19th"),
+        ("twenty fourth street mission", "24th"),
+        ("ashby", "ashb"),
+        ("antioch", "antc"),
+        ("balboa park", "balb"),
+        ("bay fair", "bayf"),
+        ("castro valley", "cast"),
+        ("civic center", "civc"),
+        ("coliseum", "cols"),
+        ("colma", "colm"),
+        ("concord", "conc"),
+        ("daly city", "daly"),
+        ("downtown berkeley", "dbrk"),
+        ("dublin pleasanton", "dubl"),
+        ("el cerrito del norte", "deln"),
+        ("el cerrito plaza", "plza"),
+        ("embarcadero", "embr"),
+        ("fremont", "frmt"),
+        ("fruitvale (Oakland)", "ftvl"),
+        ("glen park", "glen"),
+        ("hayward", "hayw"),
+        ("lafayette", "lafy"),
+        ("lake merritt (Oakland)", "lake"),
+        ("macarthur", "mcar"),
+        ("millbrae", "mlbr"),
+        ("montgomery St.", "mont"),
+        ("north berkeley", "nbrk"),
+        ("North Concord/Martinez", "ncon"),
+        ("oakland international airport", "oakl"),
+        ("orinda", "orin"),
+        ("pittsburg bay point", "pitt"),
+        ("pittsburg center", "pctr"),
+        ("pleasant hill", "phil"),
+        ("powell st.", "powl"),
+        ("richmond", "rich"),
+        ("rockridge", "rock"),
+        ("san bruno", "sbrn"),
+        ("san francisco international airport", "sfia"),
+        ("san leandro", "sanl"),
+        ("south hayward", "shay"),
+        ("south san francisco", "ssan"),
+        ("union city", "ucty"),
+        ("warm springs south fremont", "warm"),
+        ("walnut creek", "wcrk"),
+        ("west dublin", "wdub"),
+        ("west oakland", "woak")
+    ].iter().cloned().collect()
+}
+
 fn http_get(url: &str) -> reqwest::Result<String> {
     let mut response = reqwest::get(url)?;
     let mut buffer = String::new();
@@ -54,10 +107,17 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
     )
 }
 
-fn handle_fare(_req: &Request) -> std::result::Result<Response,HandlerError> {
-    let payload_text = http_get(
-        "https://api.bart.gov/api/sched.aspx?cmd=fare&orig=12th&dest=embr&date=today&key=MW9S-E7SL-26DU-VV8V&json=y"
-    );
+fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Result<Response,HandlerError> {
+    let origin_key = req.slot_value("origin").unwrap().to_lowercase();
+    let dest_key = req.slot_value("dest").unwrap().to_lowercase();
+
+    let origin = stations.get(&origin_key[..]).unwrap();
+    let dest = stations.get(&dest_key[..]).unwrap();
+
+    let url = format!("https://api.bart.gov/api/sched.aspx?cmd=fare&\
+        orig={}&dest={}&date=today&key=MW9S-E7SL-26DU-VV8V&json=y", origin, dest);
+
+    let payload_text = http_get(&url);
 
     let s= &payload_text.unwrap()[..];
     let fare: Result<bart_response::fare::Response> = serde_json::from_str(s);
@@ -76,7 +136,6 @@ fn handle_fare(_req: &Request) -> std::result::Result<Response,HandlerError> {
             &response_buffer[..]
         )
     )
-
 }
 
 fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
@@ -84,64 +143,14 @@ fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
 }
 
 fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerError> {
-    let stations: HashMap<&str, &str> = [
-        ("12th St. Oakland City Center", "12th"),
-        ("16th St. Mission (SF)", "16th"),
-        ("19th St. Oakland", "19th"),
-        ("24th St. Mission (SF)", "24th"),
-        ("Ashby (Berkeley)", "ashb")
-        ("Antioch", "antc"),
-        ("Balboa Park (SF)", "balb"),
-        ("Bay Fair (San Leandro)", "bayf"),
-        ("Castro Valley", "cast"),
-        ("Civic Center (SF)", "civc"),
-        ("Coliseum", "cols"),
-        ("Colma", "colm"),
-        ("Concord", "conc"),
-        ("Daly City", "daly"),
-        ("Downtown Berkeley", "dbrk"),
-        ("Dublin/Pleasanton", "dubl"),
-        ("El Cerrito del Norte", "deln"),
-        ("El Cerrito Plaza", "plza"),
-        ("Embarcadero (SF)", "embr"),
-        ("Fremont", "frmt"),
-        ("Fruitvale (Oakland)", "ftvl"),
-        ("Glen Park (SF)", "glen"),
-        ("Hayward", "hayw"),
-        ("Lafayette", "lafy"),
-        ("Lake Merritt (Oakland)", "lake"),
-        ("MacArthur (Oakland)", "mcar"),
-        ("Millbrae", "mlbr"),
-        ("Montgomery St. (SF)", "mont"),
-        ("North Berkeley", "nbrk"),
-        ("North Concord/Martinez", "ncon"),
-        ("Oakland Int'l Airport", "oakl"),
-        ("Orinda", "orin"),
-        ("Pittsburg/Bay Point", "pitt"),
-        ("Pittsburg Center", "pctr"),
-        ("Pleasant Hill", "phil"),
-        ("Powell St. (SF)", "powl"),
-        ("Richmond", "rich"),
-        ("Rockridge (Oakland)", "rock"),
-        ("San Bruno", "sbrn"),
-        ("San Francisco Int'l Airport", "sfia"),
-        ("San Leandro", "sanl"),
-        ("South Hayward", "shay"),
-        ("South San Francisco", "ssan"),
-        ("Union City", "ucty"),
-        ("Warm Springs/South Fremont", "warm"),
-        ("Walnut Creek", "wcrk"),
-        ("West Dublin", "wdub"),
-        ("West Oakland", "woak")
-    ].iter().cloned().collect();
-
+    let stations = stations();
 
     match req.intent() {
         IntentType::Help => handle_help(&req),
         IntentType::User(s) =>
             match &s[..] {
                 "advisory" => handle_advisory(&req),
-                "fare" => handle_fare(&req),
+                "fare" => handle_fare(&req, &stations),
                 _ => handle_cancel(&req)
             }
         _ => handle_cancel(&req)
