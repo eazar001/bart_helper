@@ -5,13 +5,9 @@ use self::lambda::{lambda, Context, error::HandlerError};
 use alexa_sdk::{Request,Response};
 use alexa_sdk::request::{IntentType};
 use std::error::Error;
-use std::io::Read;
 use std::collections::HashMap;
-use regex::RegexSet;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value};
-use std::hash::Hash;
+use serde_json::{Result};
 
 
 fn stations() -> HashMap<&'static str, &'static str> {
@@ -96,11 +92,8 @@ fn stations() -> HashMap<&'static str, &'static str> {
 
 fn http_get(url: &str) -> reqwest::Result<String> {
     let mut response = reqwest::get(url)?;
-    let mut buffer = String::new();
 
-    response.read_to_string(&mut buffer);
-
-    Ok(buffer)
+    Ok(response.text().unwrap())
 }
 
 fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
