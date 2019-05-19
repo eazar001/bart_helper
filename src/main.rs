@@ -145,7 +145,17 @@ fn dollar_amount(s: &str) -> String {
     let cents = &format!("{:.2} cents", cents)[2..];
     let mut price: String = String::new();
 
-    price.push_str(&format!("{} {}", dollars, cents));
+    price = match &cents.to_string()[..2] {
+        "00" => {
+            price.push_str(dollars);
+            price
+        }
+        _ => {
+            price.push_str(&format!("{} {}", dollars, cents));
+            price
+        }
+    };
+
     price
 }
 
