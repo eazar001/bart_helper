@@ -132,6 +132,19 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
     )
 }
 
+fn dollar_amount(s: &str) -> String {
+    let price: f32 = s.parse().unwrap();
+    let dollars = price.floor();
+    let cents = price - dollars;
+
+    let dollars = &format!("{} dollars", (dollars as u32).to_string());
+    let cents = &format!("{:.2} cents", cents)[2..];
+    let mut price: String = String::new();
+
+    price.push_str(&format!("{} {}", dollars, cents));
+    price
+}
+
 fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
@@ -164,7 +177,7 @@ fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Re
     Ok(
         Response::new_simple(
             "Fares",
-            &response_buffer[..]
+            &dollar_amount(&response_buffer)
         )
     )
 }
