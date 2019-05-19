@@ -141,6 +141,16 @@ fn dollar_amount(s: &str) -> String {
     let dollars = price.floor();
     let cents = price - dollars;
 
+    if dollars == 0.0 {
+        let cents = &format!("{:.2} cents", cents)[2..];
+
+        if &cents.to_string()[..2] == "00" {
+            return String::from("0 dollars");
+        }
+
+        return cents.to_string();
+    }
+
     let dollars = &format!("{} dollars", (dollars as u32).to_string());
     let cents = &format!("{:.2} cents", cents)[2..];
     let mut price: String = String::new();
