@@ -190,18 +190,19 @@ fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Re
     let s= &payload_text.unwrap()[..];
     let fare: Result<bart_response::fare::Response> = serde_json::from_str(s);
     let mut response_buffer = String::new();
+    let mut response = String::new();
 
     for e in fare.unwrap().root.fares.payload {
-        let response = e.amount;
-//        response_buffer.push_str(response);
-        response_buffer.push_str(response);
-        break;
+        let (payment, price) = (e.name, dollar_amount(e.amount));
+        response.push_str(&format!("{}, paying by {}. ", price, payment));
     }
+
+    response_buffer.push_str(&response);
 
     Ok(
         Response::new_simple(
             "Fares",
-            &dollar_amount(&response_buffer)
+            &response_buffer
         )
     )
 }

@@ -77,7 +77,7 @@ pub struct FarePayLoad<'a> {
 
     #[serde(borrow)]
     #[serde(rename = "@name")]
-    name: &'a str
+    pub name: &'a str
 }
 
 #[derive(Deserialize, Serialize, Debug)]
