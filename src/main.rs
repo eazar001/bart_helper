@@ -10,84 +10,91 @@ use regex::Regex;
 use serde_json::{Result};
 
 
-fn stations() -> HashMap<&'static str, &'static str> {
-    [
-        ("twelfth street oakland city center", "12th"),
-        ("twelfth street", "12th"),
-        ("twelfth street oakland", "12th"),
-        ("oakland city center", "12th"),
-        ("sixteenth street mission", "16th"),
-        ("sixteenth street", "16th"),
-        ("nineteenth street oakland", "19th"),
-        ("nineteenth street", "19th"),
-        ("twenty fourth street mission", "24th"),
-        ("ashby", "ashb"),
-        ("antioch", "antc"),
-        ("balboa park", "balb"),
-        ("bay fair", "bayf"),
-        ("castro valley", "cast"),
-        ("civic center", "civc"),
-        ("coliseum", "cols"),
-        ("colosseum", "cols"),
-        ("the coliseum", "cols"),
-        ("the colosseum", "cols"),
-        ("oakland coliseum", "cols"),
-        ("oakland colosseum", "cols"),
-        ("colma", "colm"),
-        ("coma", "colm"),
-        ("concord", "conc"),
-        ("daly city", "daly"),
-        ("downtown berkeley", "dbrk"),
-        ("dublin pleasanton", "dubl"),
-        ("east dublin", "dubl"),
-        ("el cerrito del norte", "deln"),
-        ("el cerrito plaza", "plza"),
-        ("embarcadero", "embr"),
-        ("fremont", "frmt"),
-        ("fruitvale", "ftvl"),
-        ("glen park", "glen"),
-        ("hayward", "hayw"),
-        ("lafayette", "lafy"),
-        ("lake merritt", "lake"),
-        ("macarthur", "mcar"),
-        ("millbrae", "mlbr"),
-        ("montgomery street", "mont"),
-        ("north berkeley", "nbrk"),
-        ("north concord martinez", "ncon"),
-        ("north concord", "ncon"),
-        ("martinez", "ncon"),
-        ("oakland international airport", "oakl"),
-        ("oakland airport", "oakl"),
-        ("oaktown airport", "oakl"),
-        ("oak", "oakl"),
-        ("o.a.k", "oakl"),
-        ("orinda", "orin"),
-        ("pittsburg bay point", "pitt"),
-        ("bay point", "pitt"),
-        ("pittsburg center", "pctr"),
-        ("pleasant hill", "phil"),
-        ("powell street", "powl"),
-        ("powell", "powl"),
-        ("richmond", "rich"),
-        ("rockridge", "rock"),
-        ("san bruno", "sbrn"),
-        ("san francisco international airport", "sfia"),
-        ("san francisco airport", "sfia"),
-        ("frisco airport", "sfia"),
-        ("sfo", "sfia"),
-        ("s.f.o", "sfia"),
-        ("san leandro", "sanl"),
-        ("south hayward", "shay"),
-        ("south san francisco", "ssan"),
-        ("south frisco", "ssan"),
-        ("union city", "ucty"),
-        ("warm springs south fremont", "warm"),
-        ("warm springs", "warm"),
-        ("south fremont", "warm"),
-        ("walnut creek", "wcrk"),
-        ("west dublin", "wdub"),
-        ("west oakland", "woak")
-    ].iter().cloned().collect()
+#[macro_use]
+extern crate lazy_static;
+
+lazy_static! {
+    static ref STATIONS: HashMap<&'static str, &'static str> = {
+        stations()
+    };
+}
+
+fn stations() -> HashMap<&'static str, &'static str> {[
+    ("twelfth street oakland city center", "12th"),
+    ("twelfth street", "12th"),
+    ("twelfth street oakland", "12th"),
+    ("oakland city center", "12th"),
+    ("sixteenth street mission", "16th"),
+    ("sixteenth street", "16th"),
+    ("nineteenth street oakland", "19th"),
+    ("nineteenth street", "19th"),
+    ("twenty fourth street mission", "24th"),
+    ("ashby", "ashb"),
+    ("antioch", "antc"),
+    ("balboa park", "balb"),
+    ("bay fair", "bayf"),
+    ("castro valley", "cast"),
+    ("civic center", "civc"),
+    ("coliseum", "cols"),
+    ("colosseum", "cols"),
+    ("the coliseum", "cols"),
+    ("the colosseum", "cols"),
+    ("oakland coliseum", "cols"),
+    ("oakland colosseum", "cols"),
+    ("colma", "colm"),
+    ("coma", "colm"),
+    ("concord", "conc"),
+    ("daly city", "daly"),
+    ("downtown berkeley", "dbrk"),
+    ("dublin pleasanton", "dubl"),
+    ("east dublin", "dubl"),
+    ("el cerrito del norte", "deln"),
+    ("el cerrito plaza", "plza"),
+    ("embarcadero", "embr"),
+    ("fremont", "frmt"),
+    ("fruitvale", "ftvl"),
+    ("glen park", "glen"),
+    ("hayward", "hayw"),
+    ("lafayette", "lafy"),
+    ("lake merritt", "lake"),
+    ("macarthur", "mcar"),
+    ("millbrae", "mlbr"),
+    ("montgomery street", "mont"),
+    ("north berkeley", "nbrk"),
+    ("north concord martinez", "ncon"),
+    ("north concord", "ncon"),
+    ("martinez", "ncon"),
+    ("oakland international airport", "oakl"),
+    ("oakland airport", "oakl"),
+    ("oaktown airport", "oakl"),
+    ("oak", "oakl"),
+    ("o.a.k", "oakl"),
+    ("orinda", "orin"),
+    ("pittsburg bay point", "pitt"),
+    ("bay point", "pitt"),
+    ("pittsburg center", "pctr"),
+    ("pleasant hill", "phil"),
+    ("powell street", "powl"),
+    ("powell", "powl"),
+    ("richmond", "rich"),
+    ("rockridge", "rock"),
+    ("san bruno", "sbrn"),
+    ("san francisco international airport", "sfia"),
+    ("san francisco airport", "sfia"),
+    ("frisco airport", "sfia"),
+    ("sfo", "sfia"),
+    ("s.f.o", "sfia"),
+    ("san leandro", "sanl"),
+    ("south hayward", "shay"),
+    ("south san francisco", "ssan"),
+    ("south frisco", "ssan"),
+    ("union city", "ucty"),
+    ("warm springs south fremont", "warm"),
+    ("warm springs", "warm"),
+    ("south fremont", "warm"),
+    ("walnut creek", "wcrk"),
+    ("west dublin", "wdub"),
+    ("west oakland", "woak")].iter().cloned().collect()
 }
 
 fn http_get(url: &str) -> reqwest::Result<String> {
@@ -162,7 +169,7 @@ fn dollar_amount(s: &str) -> String {
     price
 }
 
-fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Result<Response,HandlerError> {
+fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
 
@@ -172,8 +179,8 @@ fn handle_fare(req: &Request, stations: &HashMap<&str, &str>) -> std::result::Re
     let origin_key = daily_re.replace_all(&origin_lower, "daly ");
     let dest_key = daily_re.replace_all(&dest_lower, "daly ");
 
-    let origin = stations.get(&origin_key[..]).unwrap();
-    let dest = stations.get(&dest_key[..]).unwrap();
+    let origin = STATIONS.get(&origin_key[..]).unwrap();
+    let dest = STATIONS.get(&dest_key[..]).unwrap();
 
     let url = format!("https://api.bart.gov/api/sched.aspx?cmd=fare&\
         orig={}&dest={}&date=today&key=MW9S-E7SL-26DU-VV8V&json=y", origin, dest);
@@ -205,14 +212,12 @@ fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
 }
 
 fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerError> {
-    let stations = stations();
-
     match req.intent() {
         IntentType::Help => handle_help(&req),
         IntentType::User(s) =>
             match &s[..] {
                 "advisory" => handle_advisory(&req),
-                "fare" => handle_fare(&req, &stations),
+                "fare" => handle_fare(&req),
                 _ => handle_cancel(&req)
             }
         _ => handle_cancel(&req)
