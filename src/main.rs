@@ -8,6 +8,7 @@ use std::error::Error;
 use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
+use std::fs::read_to_string;
 
 
 #[macro_use]
@@ -140,28 +141,53 @@ fn dollar_amount(s: &str) -> String {
     let price: f32 = s.parse().unwrap();
     let dollars = price.floor();
     let cents = price - dollars;
+    let one_dollar = dollars == 1.00;
 
     if dollars == 0.0 {
         let cents = &format!("{:.2} cents", cents)[2..];
 
-        if &cents.to_string()[..2] == "00" {
-            return String::from("0 dollars");
+        match &cents.to_string()[..2] {
+            "00" => return String::from("0 dollars"),
+            "01" => return String::from("1 penny"),
+            "02" => return String::from("2 cents"),
+            "03" => return String::from("3 cents"),
+            "04" => return String::from("4 cents"),
+            "05" => return String::from("5 cents"),
+            "06" => return String::from("6 cents"),
+            "07" => return String::from("7 cents"),
+            "08" => return String::from("8 cents"),
+            "09" => return String::from("9 cents"),
+            _ => return cents.to_string()
         }
-
-        return cents.to_string();
     }
 
-    let dollars = &format!("{} dollars", (dollars as u32).to_string());
+    let dollars = &match one_dollar {
+        true => format!("{} dollar", (dollars as u32).to_string()),
+        _ => format!("{} dollars", (dollars as u32).to_string())
+    };
+
     let cents = &format!("{:.2} cents", cents)[2..];
     let mut price: String = String::new();
+
+    let small_change = match cents.chars().next().unwrap() {
+        '0' => true,
+        _ => false
+    };
 
     price = match &cents.to_string()[..2] {
         "00" => {
             price.push_str(dollars);
             price
-        }
+        },
+
         _ => {
-            price.push_str(&format!("{} {}", dollars, cents));
+            if small_change {
+                let cents = &format!("{:.2}cents", &cents.to_string()[1..]);
+                price.push_str(&format!("{} {}", dollars, cents));
+            } else {
+                price.push_str(&format!("{} {}", dollars, cents));
+            }
+
             price
         }
     };
