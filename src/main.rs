@@ -8,7 +8,6 @@ use std::error::Error;
 use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
-use std::fs::read_to_string;
 
 
 #[macro_use]
@@ -125,8 +124,7 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
     let mut response_buffer = String::new();
 
     for e in bsa.unwrap().root.payload {
-        let response = e.description.cdata;
-        response_buffer.push_str(response);
+        response_buffer.push_str(e.description.cdata);
     }
 
     Ok(
@@ -198,7 +196,6 @@ fn dollar_amount(s: &str) -> String {
 fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
-
     let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
     let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
 
@@ -219,8 +216,7 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let mut response = String::new();
 
     for e in fare.unwrap().root.fares.payload {
-        let (payment, price) = (e.name, dollar_amount(e.amount));
-        response.push_str(&format!("{}, paying by {}. ", price, payment));
+        response.push_str(&format!("{}, paying by {}.\n", dollar_amount(e.amount), e.name));
     }
 
     response_buffer.push_str(&response);
