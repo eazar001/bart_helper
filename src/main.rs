@@ -3,14 +3,12 @@ mod bart_response;
 use lambda_runtime as lambda;
 use self::lambda::{lambda, Context, error::HandlerError};
 use alexa_sdk::{Request, Response};
-use alexa_sdk::response::{Speech, Card, Image};
+use alexa_sdk::response::{Speech, Card};
 use alexa_sdk::request::{IntentType};
 use std::error::Error;
 use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
-use openssl_sys::SSL_get_peer_cert_chain;
-use alexa_sdk::response::CardType::Standard;
 
 
 #[macro_use]
@@ -24,14 +22,26 @@ lazy_static! {
 
 fn stations() -> HashMap<&'static str, &'static str> {[
     ("twelfth street oakland city center", "12th"),
+    ("12th street oakland city center", "12th"),
     ("twelfth street", "12th"),
+    ("12th street", "12th"),
+    ("twelve street", "12th"),
     ("twelfth street oakland", "12th"),
+    ("12th street oakland", "12th"),
     ("oakland city center", "12th"),
     ("sixteenth street mission", "16th"),
+    ("16th street mission", "16th"),
     ("sixteenth street", "16th"),
+    ("16th street", "16th"),
     ("nineteenth street oakland", "19th"),
+    ("19th street oakland", "19th"),
+    ("nineteen street", "19th"),
     ("nineteenth street", "19th"),
+    ("19th street", "19th"),
     ("twenty fourth street mission", "24th"),
+    ("24th street mission", "24th"),
+    ("twenty four street", "24th"),
+    ("24th street", "24th"),
     ("ashby", "ashb"),
     ("antioch", "antc"),
     ("balboa park", "balb"),
@@ -61,6 +71,7 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("lafayette", "lafy"),
     ("lake merritt", "lake"),
     ("macarthur", "mcar"),
+    ("mccarthy", "mcar"),
     ("millbrae", "mlbr"),
     ("montgomery street", "mont"),
     ("north berkeley", "nbrk"),
@@ -198,7 +209,7 @@ fn dollar_amount(s: &str) -> String {
 
 fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
-    let map_url = "https://www.bart.gov/sites/default/files/images/basic_page/system-map-weekday.png";
+    let _map_url = "https://www.bart.gov/sites/default/files/images/basic_page/system-map-weekday.png";
 
     let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
     let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
@@ -221,7 +232,12 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let mut card_response = String::new();
 
     for e in fare.unwrap().root.fares.payload {
-        response.push_str(&format!("{}, paying by {}.\n", dollar_amount(e.amount), e.name));
+        let payment_method = match e.name {
+            "Senior/Disabled Clipper" => "Senior Disabled Clipper",
+            _ => e.name
+        };
+
+        response.push_str(&format!("{}, paying by {}.\n", dollar_amount(e.amount), payment_method));
         card_response.push_str(&format!("{}: ${}\n", e.name, e.amount));
     }
 
