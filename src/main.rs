@@ -2,12 +2,15 @@ mod bart_response;
 
 use lambda_runtime as lambda;
 use self::lambda::{lambda, Context, error::HandlerError};
-use alexa_sdk::{Request,Response};
+use alexa_sdk::{Request, Response};
+use alexa_sdk::response::{Speech, Card, Image};
 use alexa_sdk::request::{IntentType};
 use std::error::Error;
 use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
+use openssl_sys::SSL_get_peer_cert_chain;
+use alexa_sdk::response::CardType::Standard;
 
 
 #[macro_use]
@@ -195,6 +198,7 @@ fn dollar_amount(s: &str) -> String {
 
 fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
+    let map_url = "https://www.bart.gov/sites/default/files/images/basic_page/system-map-weekday.png";
 
     let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
     let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
@@ -214,19 +218,32 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let fare: Result<bart_response::fare::Response> = serde_json::from_str(s);
     let mut response_buffer = String::new();
     let mut response = String::new();
+    let mut card_response = String::new();
 
     for e in fare.unwrap().root.fares.payload {
         response.push_str(&format!("{}, paying by {}.\n", dollar_amount(e.amount), e.name));
+        card_response.push_str(&format!("{}: ${}\n", e.name, e.amount));
     }
 
     response_buffer.push_str(&response);
 
     Ok(
-        Response::new_simple(
-            "Fares",
-            &response_buffer
-        )
+        Response::new(true)
+            .speech(Speech::plain(&response_buffer))
+            .card(
+                Card::simple(
+                    "Fares",
+                    &card_response
+                )
+            )
     )
+
+//    Ok(
+//        Response::new_simple(
+//            "Fares",
+//            &response_buffer
+//        )
+//    )
 }
 
 fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
