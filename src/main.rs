@@ -118,13 +118,17 @@ fn http_get(url: &str) -> reqwest::Result<String> {
 }
 
 fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
-    Ok(
-        Response::new_simple(
-            "Usage Help",
-            "To get information about BART service advisories and alerts, say:\
-            Alexa, ask BART info for updates."
-        )
-    )
+    let response = Response::new_simple(
+        "Usage Help",
+        "To get information about BART service advisories and alerts, say: \
+            Alexa, ask BART info for updates. To inquire about fares between stations say \
+            a command such as: Alexa, ask BART info for the fare from West Oakland to \
+            Richmond, or Alexa, ask BART info for the fare from South San Francisco to \
+            Lake Merritt. To avoid confusion, try to pronounce the station names clearly.
+            "
+    );
+
+    Ok(response)
 }
 
 fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError> {
@@ -249,10 +253,6 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(response)
 }
 
-fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
-    Ok(Response::end())
-}
-
 fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerError> {
     match req.intent() {
         IntentType::Help => handle_help(&req),
@@ -260,9 +260,9 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerE
             match &s[..] {
                 "advisory" => handle_advisory(&req),
                 "fare" => handle_fare(&req),
-                _ => handle_cancel(&req)
+                _ => handle_help(&req)
             }
-        _ => handle_cancel(&req)
+        _ => handle_help(&req)
     }
 }
 
