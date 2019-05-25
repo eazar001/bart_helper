@@ -209,7 +209,6 @@ fn dollar_amount(s: &str) -> String {
 
 fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
-    let _map_url = "https://www.bart.gov/sites/default/files/images/basic_page/system-map-weekday.png";
 
     let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
     let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
@@ -243,23 +242,11 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
 
     response_buffer.push_str(&response);
 
-    Ok(
-        Response::new(true)
-            .speech(Speech::plain(&response_buffer))
-            .card(
-                Card::simple(
-                    "Fares",
-                    &card_response
-                )
-            )
-    )
+    let response = Response::new(true)
+        .speech(Speech::plain(&response_buffer))
+        .card(Card::simple("Fares", &card_response));
 
-//    Ok(
-//        Response::new_simple(
-//            "Fares",
-//            &response_buffer
-//        )
-//    )
+    Ok(response)
 }
 
 fn handle_cancel(_req: &Request) -> std::result::Result<Response,HandlerError> {
