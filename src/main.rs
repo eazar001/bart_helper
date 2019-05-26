@@ -165,6 +165,16 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
     )
 }
 
+fn invalid_key(s: &str) -> Response {
+    let response = Response::new_simple(
+        "Invalid station",
+        &format!("Sorry I thought I heard you say {}, but that is not a valid station. \
+        Please try again.", s)
+    );
+
+    response
+}
+
 fn dollar_amount(s: &str) -> String {
     let price: f32 = s.parse().unwrap();
     let dollars = price.floor();
@@ -232,8 +242,15 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     let origin_key = daily_re.replace_all(&origin_lower, "daly ");
     let dest_key = daily_re.replace_all(&dest_lower, "daly ");
 
-    let origin = STATIONS.get(&origin_key[..]).unwrap();
-    let dest = STATIONS.get(&dest_key[..]).unwrap();
+    let origin = match STATIONS.get(&origin_key[..]) {
+        Some(s) => s,
+        None => return Ok(invalid_key(&origin_key))
+    };
+
+    let dest = match STATIONS.get(&dest_key[..]) {
+        Some(s) => s,
+        None => return Ok(invalid_key(&dest_key))
+    };
 
     let url = format!("https://api.bart.gov/api/sched.aspx?cmd=fare&\
         orig={}&dest={}&date=today&key=MW9S-E7SL-26DU-VV8V&json=y", origin, dest);
