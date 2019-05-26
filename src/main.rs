@@ -118,15 +118,27 @@ fn http_get(url: &str) -> reqwest::Result<String> {
 }
 
 fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
-    let response = Response::new_simple(
-        "Usage Help",
-        "To get information about BART service advisories and alerts, say: \
+    let response = Response::new(true)
+        .card(Card::simple(
+            "Usage Help",
+            "To get information about BART service advisories and alerts, say: \
             Alexa, ask BART info for updates. To inquire about fares between stations say \
             a command such as: Alexa, ask BART info for the fare from West Oakland to \
             Richmond, or Alexa, ask BART info for the fare from South San Francisco to \
             Lake Merritt. To avoid confusion, try to pronounce the station names clearly.
             "
-    );
+        ))
+        .speech(Speech::ssml(
+            "<speak>To get information about <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> \
+            service advisories and alerts, say: Alexa, ask \
+            <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> info for updates. To inquire about \
+            fares between stations say a command such as: Alexa, ask \
+            <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> info for the fare from West Oakland \
+            to Richmond, or Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> info for \
+            the fare from South San Francisco to Lake Merritt. To avoid confusion, try to \
+            prounounce the station names clearly.</speak>
+            "
+        ));
 
     Ok(response)
 }
