@@ -35,6 +35,8 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("16th street", "16th"),
     ("nineteenth street oakland", "19th"),
     ("19th street oakland", "19th"),
+    ("19 street oakland", "19th"),
+    ("19 street", "19th"),
     ("nineteen street", "19th"),
     ("nineteenth street", "19th"),
     ("19th street", "19th"),
