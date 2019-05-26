@@ -25,13 +25,19 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("12th street oakland city center", "12th"),
     ("twelfth street", "12th"),
     ("12th street", "12th"),
+    ("12 street", "12th"),
+    ("12 street oakland", "12th"),
+    ("12 street oakland city center", "12th"),
+    ("12 street oakland city", "12th"),
     ("twelve street", "12th"),
     ("twelfth street oakland", "12th"),
     ("12th street oakland", "12th"),
     ("oakland city center", "12th"),
+    ("16 street mission", "16th"),
     ("sixteenth street mission", "16th"),
     ("16th street mission", "16th"),
     ("sixteenth street", "16th"),
+    ("16 street", "16th"),
     ("16th street", "16th"),
     ("nineteenth street oakland", "19th"),
     ("19th street oakland", "19th"),
@@ -40,6 +46,8 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("nineteen street", "19th"),
     ("nineteenth street", "19th"),
     ("19th street", "19th"),
+    ("24 street mission", "24th"),
+    ("24 street", "24th"),
     ("twenty fourth street mission", "24th"),
     ("24th street mission", "24th"),
     ("twenty four street", "24th"),
@@ -170,7 +178,7 @@ fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError>
 fn invalid_key(s: &str) -> Response {
     let response = Response::new_simple(
         "Invalid station",
-        &format!("Sorry I thought I heard you say {}, but that is not a valid station. \
+        &format!("Sorry I thought I heard you say \"{}\", but that is not a valid station.\n\
         Please try again.", s)
     );
 
