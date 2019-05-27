@@ -9,10 +9,8 @@ use std::error::Error;
 use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
+use lazy_static::lazy_static;
 
-
-#[macro_use]
-extern crate lazy_static;
 
 lazy_static! {
     static ref STATIONS: HashMap<&'static str, &'static str> = {
