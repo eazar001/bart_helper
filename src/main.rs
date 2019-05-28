@@ -1,3 +1,4 @@
+mod bart;
 mod bart_response;
 
 use lambda_runtime as lambda;
@@ -151,7 +152,7 @@ fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(response)
 }
 
-fn handle_advisory(_req: &Request) -> std::result::Result<Response,HandlerError> {
+fn handle_advisory(_req: &Request) -> std::result::Result<Response, HandlerError> {
     let payload_text = http_get(
         "https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=MW9S-E7SL-26DU-VV8V&json=y"
     );
@@ -241,7 +242,7 @@ fn dollar_amount(s: &str) -> String {
     price
 }
 
-fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
+fn handle_fare(req: &Request) -> std::result::Result<Response, HandlerError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
     let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
@@ -290,7 +291,7 @@ fn handle_fare(req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(response)
 }
 
-fn handler(req: Request, _ctx: Context) -> std::result::Result<Response,HandlerError> {
+fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
     match req.intent() {
         IntentType::Help => handle_help(&req),
         IntentType::User(s) =>
