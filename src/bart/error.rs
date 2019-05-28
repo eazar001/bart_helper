@@ -19,7 +19,7 @@ pub enum BartError {
 
 impl Display for BartError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{:?}")
+        write!(f, "{:?}", self)
     }
 }
 
