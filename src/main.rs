@@ -11,6 +11,8 @@ use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
 use lazy_static::lazy_static;
+use crate::bart::error::BartError;
+use crate::bart::error::BartError::InvalidStation;
 
 
 lazy_static! {
@@ -120,13 +122,16 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("west oakland", "woak")].iter().cloned().collect()
 }
 
-fn http_get(url: &str) -> reqwest::Result<String> {
-    let mut response = reqwest::get(url)?;
+fn http_get(url: &str) -> std::result::Result<String, BartError> {
+    let mut response = match reqwest::get(url){
+        Ok(r) => r,
+        Err(_) => return Err(BartError::NoConnection)
+    };
 
     Ok(response.text().unwrap())
 }
 
-fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
+fn handle_help(_req: &Request) -> std::result::Result<Response, BartError> {
     let response = Response::new(true)
         .card(Card::simple(
             "Usage Help",
@@ -152,12 +157,12 @@ fn handle_help(_req: &Request) -> std::result::Result<Response,HandlerError> {
     Ok(response)
 }
 
-fn handle_advisory(_req: &Request) -> std::result::Result<Response, HandlerError> {
+fn handle_advisory(_req: &Request) -> std::result::Result<Response, BartError> {
     let payload_text = http_get(
         "https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=MW9S-E7SL-26DU-VV8V&json=y"
-    );
+    )?;
 
-    let s = &payload_text.unwrap()[..];
+    let s = &payload_text[..];
 
     let bsa: Result<bart_response::bsa::Response> = serde_json::from_str(s);
     let mut response_buffer = String::new();
@@ -242,31 +247,36 @@ fn dollar_amount(s: &str) -> String {
     price
 }
 
-fn handle_fare(req: &Request) -> std::result::Result<Response, HandlerError> {
+fn get_station(station: &str) -> std::result::Result<&str, BartError> {
+    match STATIONS.get(station) {
+        Some(s) => Ok(s),
+        None => Err(InvalidStation(String::from(station)))
+    }
+}
+
+fn handle_fare(req: &Request) -> std::result::Result<Response, BartError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
-    let origin_lower = req.slot_value("origin").unwrap().to_lowercase();
-    let dest_lower = req.slot_value("dest").unwrap().to_lowercase();
+    let origin_lower = req.slot_value("origin")
+        .map(|c| c.to_lowercase())
+        .unwrap();
+
+    let dest_lower = req.slot_value("dest")
+        .map(|c| c.to_lowercase())
+        .unwrap();
 
     let origin_key = daily_re.replace_all(&origin_lower, "daly ");
     let dest_key = daily_re.replace_all(&dest_lower, "daly ");
 
-    let origin = match STATIONS.get(&origin_key[..]) {
-        Some(s) => s,
-        None => return Ok(invalid_key(&origin_key))
-    };
-
-    let dest = match STATIONS.get(&dest_key[..]) {
-        Some(s) => s,
-        None => return Ok(invalid_key(&dest_key))
-    };
+    let origin = get_station(&origin_key[..])?;
+    let dest = get_station(&dest_key[..])?;
 
     let url = format!("https://api.bart.gov/api/sched.aspx?cmd=fare&\
         orig={}&dest={}&date=today&key=MW9S-E7SL-26DU-VV8V&json=y", origin, dest);
 
-    let payload_text = http_get(&url);
+    let payload_text = http_get(&url)?;
 
-    let s= &payload_text.unwrap()[..];
+    let s= &payload_text[..];
     let fare: Result<bart_response::fare::Response> = serde_json::from_str(s);
     let mut response_buffer = String::new();
     let mut response = String::new();
@@ -291,7 +301,7 @@ fn handle_fare(req: &Request) -> std::result::Result<Response, HandlerError> {
     Ok(response)
 }
 
-fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
+fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, BartError> {
     match req.intent() {
         IntentType::Help => handle_help(&req),
         IntentType::User(s) =>
