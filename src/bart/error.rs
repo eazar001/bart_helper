@@ -1,6 +1,5 @@
 use core::fmt;
 use core::fmt::{Display, Formatter};
-use std::fmt::Debug;
 use std::error::Error;
 use lambda_runtime::error::{LambdaErrorExt, HandlerError};
 use BartError::*;

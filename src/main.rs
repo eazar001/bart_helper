@@ -131,7 +131,7 @@ fn http_get(url: &str) -> std::result::Result<String, BartError> {
     Ok(response.text().unwrap())
 }
 
-fn handle_help(_req: &Request) -> std::result::Result<Response, BartError> {
+fn get_help(_req: &Request) -> std::result::Result<Response, BartError> {
     let response = Response::new(true)
         .card(Card::simple(
             "Usage Help",
@@ -157,7 +157,7 @@ fn handle_help(_req: &Request) -> std::result::Result<Response, BartError> {
     Ok(response)
 }
 
-fn handle_advisory(_req: &Request) -> std::result::Result<Response, BartError> {
+fn get_advisory(_req: &Request) -> std::result::Result<Response, BartError> {
     let payload_text = http_get(
         "https://api.bart.gov/api/bsa.aspx?cmd=bsa&key=MW9S-E7SL-26DU-VV8V&json=y"
     )?;
@@ -254,7 +254,7 @@ fn get_station(station: &str) -> std::result::Result<&str, BartError> {
     }
 }
 
-fn handle_fare(req: &Request) -> std::result::Result<Response, BartError> {
+fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
     let daily_re = Regex::new(r"(daily) ").unwrap();
 
     let origin_lower = req.slot_value("origin")
@@ -301,16 +301,22 @@ fn handle_fare(req: &Request) -> std::result::Result<Response, BartError> {
     Ok(response)
 }
 
-fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, BartError> {
-    match req.intent() {
-        IntentType::Help => handle_help(&req),
+fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
+    let result = match req.intent() {
+        IntentType::Help => get_help(&req),
         IntentType::User(s) =>
             match &s[..] {
-                "advisory" => handle_advisory(&req),
-                "fare" => handle_fare(&req),
-                _ => handle_help(&req)
+                "advisory" => get_advisory(&req),
+                "fare" => get_fare(&req),
+                _ => get_help(&req)
             }
-        _ => handle_help(&req)
+        _ => get_help(&req)
+    };
+
+    match result {
+        Ok(response) => Ok(response),
+        Err(InvalidStation(station)) => Ok(invalid_key(&station)),
+        Err(e) => Err(HandlerError::new(e))
     }
 }
 
