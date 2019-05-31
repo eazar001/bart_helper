@@ -11,8 +11,8 @@ use std::collections::HashMap;
 use regex::Regex;
 use serde_json::{Result};
 use lazy_static::lazy_static;
-use crate::bart::error::BartError;
-use crate::bart::error::BartError::InvalidStation;
+use bart::error::BartError;
+use bart::error::BartError::{InvalidStation, NoConnection};
 
 
 lazy_static! {
@@ -120,6 +120,17 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("walnut creek", "wcrk"),
     ("west dublin", "wdub"),
     ("west oakland", "woak")].iter().cloned().collect()
+}
+
+
+fn bart_connection_err_msg() -> Response {
+    let response = Response::new_simple(
+            "Bart Services Connection Issues",
+            "Sorry I'm having difficulties connecting to Bart Information Services right now.\n\
+            The network may be down. Please try again later."
+        );
+
+    response
 }
 
 fn http_get(url: &str) -> std::result::Result<String, BartError> {
@@ -316,6 +327,7 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, Handler
     match result {
         Ok(response) => Ok(response),
         Err(InvalidStation(station)) => Ok(invalid_key(&station)),
+        Err(NoConnection) => Ok(bart_connection_err_msg()),
         Err(e) => Err(HandlerError::new(e))
     }
 }
