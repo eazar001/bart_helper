@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "response": {
+    "outputSpeech": {
+      "type": "PlainText",
+      "text": "6 dollars 40 cents, paying by Clipper.\n6 dollars 90 cents, paying by BART Blue Ticket.\n2 dollars 40 cents, paying by Senior Disabled Clipper.\n3 dollars 20 cents, paying by Youth Clipper.\n"
+    },
+    "card": {
+      "type": "Simple",
+      "title": "Fares",
+      "content": "Clipper: $6.40\nBART Blue Ticket: $6.90\nSenior/Disabled Clipper: $2.40\nYouth Clipper: $3.20\n"
+    },
+    "shouldEndSession": true
+  }
+}

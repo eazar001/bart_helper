@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "response": {
+    "outputSpeech": {
+      "type": "PlainText",
+      "text": "Sorry I thought I heard you say \"a\", but that is not a valid station.\nPlease try again."
+    },
+    "card": {
+      "type": "Simple",
+      "title": "Invalid station",
+      "content": "Sorry I thought I heard you say \"a\", but that is not a valid station.\nPlease try again."
+    },
+    "shouldEndSession": true
+  }
+}

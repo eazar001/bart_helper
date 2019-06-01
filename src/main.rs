@@ -150,8 +150,7 @@ fn get_help(_req: &Request) -> std::result::Result<Response, BartError> {
             Alexa, ask BART info for updates. To inquire about fares between stations say \
             a command such as: Alexa, ask BART info for the fare from West Oakland to \
             Richmond, or Alexa, ask BART info for the fare from South San Francisco to \
-            Lake Merritt. To avoid confusion, try to pronounce the station names clearly.
-            "
+            Lake Merritt. To avoid confusion, try to pronounce the station names clearly."
         ))
         .speech(Speech::ssml(
             "<speak>To get information about <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> \
@@ -161,8 +160,7 @@ fn get_help(_req: &Request) -> std::result::Result<Response, BartError> {
             <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> info for the fare from West Oakland \
             to Richmond, or Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> info for \
             the fare from South San Francisco to Lake Merritt. To avoid confusion, try to \
-            prounounce the station names clearly.</speak>
-            "
+            prounounce the station names clearly.</speak>"
         ));
 
     Ok(response)
@@ -345,39 +343,39 @@ mod tests {
     use std::fs::File;
 
 
-    #[test]
-    fn test_help_request() {
-        let f = File::open("tests/help_request.json").unwrap();
+    fn test_request(request_file: &str) {
+        let f = File::open(format!("tests/{}", request_file)).unwrap();
         let bart_request= serde_json::from_reader(f).unwrap();
         let response = handler(bart_request, Context::default()).unwrap();
 
-        println!("{:?}", response)
+        let f = File::open(format!("tests/expected_output/{}", request_file)).unwrap();
+        let expected_response: Response = serde_json::from_reader(f).unwrap();
+
+        let response = serde_json::to_string(&response).unwrap();
+        let expected_response = serde_json::to_string(&expected_response).unwrap();
+
+        println!("{:?}", expected_response);
+        println!("{:?}", response);
+        assert_eq!(response, expected_response);
+    }
+
+    #[test]
+    fn test_help_request() {
+        test_request("help_request.json")
     }
 
     #[test]
     fn test_fare_colma_concord_request() {
-        let f = File::open("tests/fare_colma_concord_request.json").unwrap();
-        let bart_request= serde_json::from_reader(f).unwrap();
-        let response = handler(bart_request, Context::default()).unwrap();
-
-        println!("{:?}", response)
+        test_request("fare_colma_concord_request.json")
     }
 
     #[test]
     fn test_service_advisory() {
-        let f = File::open("tests/service_advisory.json").unwrap();
-        let bart_request= serde_json::from_reader(f).unwrap();
-        let response = handler(bart_request, Context::default()).unwrap();
-
-        println!("{:?}", response)
+        test_request("service_advisory.json")
     }
 
     #[test]
     fn test_invalid_station() {
-        let f = File::open("tests/invalid_station.json").unwrap();
-        let bart_request= serde_json::from_reader(f).unwrap();
-        let response = handler(bart_request, Context::default()).unwrap();
-
-        println!("{:?}", response)
+        test_request("invalid_station.json")
     }
 }
