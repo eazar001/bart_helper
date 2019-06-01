@@ -337,3 +337,31 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use serde_json::{Deserializer};
+    use serde_json::de::{IoRead};
+    use std::net::Shutdown::Read;
+
+    #[test]
+    fn test_help_request() {
+        let f = File::open("tests/help_request.json").unwrap();
+        let bart_request= serde_json::from_reader(f).unwrap();
+        let response = handler(bart_request, Context::default()).unwrap();
+
+        println!("show {:?}", response)
+    }
+
+    #[test]
+    fn test_fare_colma_concord_request() {
+        let f = File::open("tests/fare_colma_concord_request.json").unwrap();
+        let bart_request= serde_json::from_reader(f).unwrap();
+        let response = handler(bart_request, Context::default()).unwrap();
+
+        println!("show {:?}", response)
+    }
+}
