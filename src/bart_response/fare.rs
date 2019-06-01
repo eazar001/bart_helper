@@ -102,3 +102,9 @@ pub struct Message {
 
     co2_emissions: Msg
 }
+
+impl<'a> Response<'a> {
+    pub fn payload(&self) -> &Vec<FarePayLoad> {
+        &self.root.fares.payload
+    }
+}

@@ -76,3 +76,15 @@ pub struct Root<'a> {
     #[serde(borrow)]
     message: &'a str
 }
+
+impl<'a> Response<'a> {
+    pub fn payload(&self) -> &Vec<BsaPayload> {
+        &self.root.payload
+    }
+}
+
+impl<'a> BsaPayload<'a> {
+    pub fn description(&self) -> &str {
+        self.description.cdata
+    }
+}
