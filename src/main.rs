@@ -343,9 +343,7 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
 mod tests {
     use super::*;
     use std::fs::File;
-    use serde_json::{Deserializer};
-    use serde_json::de::{IoRead};
-    use std::net::Shutdown::Read;
+
 
     #[test]
     fn test_help_request() {
@@ -353,7 +351,7 @@ mod tests {
         let bart_request= serde_json::from_reader(f).unwrap();
         let response = handler(bart_request, Context::default()).unwrap();
 
-        println!("show {:?}", response)
+        println!("{:?}", response)
     }
 
     #[test]
@@ -362,6 +360,24 @@ mod tests {
         let bart_request= serde_json::from_reader(f).unwrap();
         let response = handler(bart_request, Context::default()).unwrap();
 
-        println!("show {:?}", response)
+        println!("{:?}", response)
+    }
+
+    #[test]
+    fn test_service_advisory() {
+        let f = File::open("tests/service_advisory.json").unwrap();
+        let bart_request= serde_json::from_reader(f).unwrap();
+        let response = handler(bart_request, Context::default()).unwrap();
+
+        println!("{:?}", response)
+    }
+
+    #[test]
+    fn test_invalid_station() {
+        let f = File::open("tests/invalid_station.json").unwrap();
+        let bart_request= serde_json::from_reader(f).unwrap();
+        let response = handler(bart_request, Context::default()).unwrap();
+
+        println!("{:?}", response)
     }
 }
