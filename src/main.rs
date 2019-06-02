@@ -316,6 +316,14 @@ fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
     Ok(response)
 }
 
+fn fallback_response() -> Response {
+    Response::new_simple(
+        "Unsupported Action",
+        "Sorry, it seems like you're asking for something I can't do. Try saying: Alexa, \
+        ask BART helper for help, for further instructions."
+    )
+}
+
 fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
     let result = match req.intent() {
         IntentType::Help => get_help(&req),
@@ -323,9 +331,9 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, Handler
             match &s[..] {
                 "advisory" => get_advisory(&req),
                 "fare" => get_fare(&req),
-                _ => get_help(&req)
+                _ => Ok(fallback_response())
             }
-        _ => get_help(&req)
+        _ => Ok(fallback_response())
     };
 
     match result {
