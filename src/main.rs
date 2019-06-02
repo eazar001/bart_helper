@@ -12,6 +12,8 @@ use regex::Regex;
 use lazy_static::lazy_static;
 use bart::error::BartError;
 use bart::error::BartError::{InvalidStation, NoConnection};
+use simple_logger;
+use serde_json::Value;
 
 
 lazy_static! {
@@ -320,13 +322,18 @@ fn fallback_response() -> Response {
     Response::new_simple(
         "Unsupported Action",
         "Sorry, it seems like you're asking for something I can't do. Try saying: Alexa, \
-        ask BART helper for help, for further instructions."
+        ask BART helper for instructions, for further assistance."
     )
 }
 
-fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
+fn handler(req: Value, _ctx: Context) -> std::result::Result<Response, HandlerError> {
+    let req: Request = match serde_json::from_value(req) {
+        Ok(r) => r,
+        _ => return Ok(fallback_response())
+    };
+
     let result = match req.intent() {
-        IntentType::None => get_help(&req),
+        IntentType::None => Ok(fallback_response()),
         IntentType::Cancel => Ok(Response::end()),
         IntentType::Stop => Ok(Response::end()),
         IntentType::Help => get_help(&req),
@@ -348,6 +355,7 @@ fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, Handler
 }
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
+    simple_logger::init_with_level(log::Level::Error)?;
     lambda!(handler);
 
     Ok(())
@@ -376,6 +384,21 @@ mod tests {
         assert_eq!(response, expected_response);
     }
 
+    fn test_request_no_equality(request_file: &str) {
+        let f = File::open(format!("tests/{}", request_file)).unwrap();
+        let bart_request= serde_json::from_reader(f).unwrap();
+        let response = handler(bart_request, Context::default()).unwrap();
+
+        let f = File::open(format!("tests/expected_output/{}", request_file)).unwrap();
+        let expected_response: Response = serde_json::from_reader(f).unwrap();
+
+        let response = serde_json::to_string(&response).unwrap();
+        let expected_response = serde_json::to_string(&expected_response).unwrap();
+
+        println!("{:?}", expected_response);
+        println!("{:?}", response);
+    }
+
     #[test]
     fn test_help_request() {
         test_request("help_request.json")
@@ -388,7 +411,7 @@ mod tests {
 
     #[test]
     fn test_service_advisory() {
-        test_request("service_advisory.json")
+        test_request_no_equality("service_advisory.json")
     }
 
     #[test]
