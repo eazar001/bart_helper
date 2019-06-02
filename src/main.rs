@@ -326,11 +326,14 @@ fn fallback_response() -> Response {
 
 fn handler(req: Request, _ctx: Context) -> std::result::Result<Response, HandlerError> {
     let result = match req.intent() {
+        IntentType::None => get_help(&req),
+        IntentType::Cancel => Response::end(),
+        IntentType::Stop => Response::end(),
         IntentType::Help => get_help(&req),
         IntentType::User(s) =>
             match &s[..] {
-                "advisory" => get_advisory(&req),
-                "fare" => get_fare(&req),
+                "Advisory" => get_advisory(&req),
+                "Fare" => get_fare(&req),
                 _ => Ok(fallback_response())
             }
         _ => Ok(fallback_response())
