@@ -333,7 +333,7 @@ fn handler(req: Value, _ctx: Context) -> std::result::Result<Response, HandlerEr
     };
 
     let result = match req.intent() {
-        IntentType::None => Ok(fallback_response()),
+        IntentType::None => get_help(&req),
         IntentType::Cancel => Ok(Response::end()),
         IntentType::Stop => Ok(Response::end()),
         IntentType::Help => get_help(&req),
