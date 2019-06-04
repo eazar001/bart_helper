@@ -79,6 +79,7 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("fremont", "frmt"),
     ("fruitvale", "ftvl"),
     ("glen park", "glen"),
+    ("glenn park", "glen"),
     ("hayward", "hayw"),
     ("lafayette", "lafy"),
     ("lake merritt", "lake"),
