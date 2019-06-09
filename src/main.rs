@@ -182,7 +182,7 @@ fn get_advisory(_req: &Request) -> std::result::Result<Response, BartError> {
     let mut response_buffer = String::new();
 
     for e in bsa.payload() {
-        response_buffer.push_str(e.description());
+        response_buffer.push_str(&format!("{}\n", e.description()));
     }
 
     Ok(
