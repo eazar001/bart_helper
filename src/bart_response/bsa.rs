@@ -7,11 +7,11 @@ pub struct Response<'a> {
     xml: Xml<'a>,
 
     #[serde(borrow)]
-    pub root: Root<'a>
+    root: Root<'a>
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Xml<'a> {
+struct Xml<'a> {
     #[serde(borrow)]
     #[serde(rename = "@version")]
     version: &'a str,
@@ -22,9 +22,9 @@ pub struct Xml<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Msg {
+struct Msg {
     #[serde(rename = "#cdata-section")]
-    pub cdata: String
+    cdata: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -40,7 +40,7 @@ pub struct BsaPayload<'a> {
     #[serde(rename = "type")]
     advisory_type: Option<&'a str>,
 
-    pub description: Msg,
+    description: Msg,
 
     sms_text: Msg,
 
@@ -52,7 +52,7 @@ pub struct BsaPayload<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Root<'a> {
+struct Root<'a> {
     #[serde(borrow)]
     #[serde(rename = "@id")]
     id: &'a str,
@@ -67,7 +67,7 @@ pub struct Root<'a> {
 
     #[serde(borrow)]
     #[serde(rename = "bsa")]
-    pub payload: Vec<BsaPayload<'a>>,
+    payload: Vec<BsaPayload<'a>>,
 
     #[serde(borrow)]
     message: &'a str
