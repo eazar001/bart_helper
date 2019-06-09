@@ -22,10 +22,9 @@ pub struct Xml<'a> {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Msg<'a> {
-    #[serde(borrow)]
+pub struct Msg {
     #[serde(rename = "#cdata-section")]
-    pub cdata: &'a str
+    pub cdata: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -41,11 +40,9 @@ pub struct BsaPayload<'a> {
     #[serde(rename = "type")]
     advisory_type: Option<&'a str>,
 
-    #[serde(borrow)]
-    pub description: Msg<'a>,
+    pub description: Msg,
 
-    #[serde(borrow)]
-    sms_text: Msg<'a>,
+    sms_text: Msg,
 
     #[serde(borrow)]
     posted: Option<&'a str>,
@@ -60,8 +57,7 @@ pub struct Root<'a> {
     #[serde(rename = "@id")]
     id: &'a str,
 
-    #[serde(borrow)]
-    uri: Msg<'a>,
+    uri: Msg,
 
     #[serde(borrow)]
     date: &'a str,
@@ -85,6 +81,6 @@ impl<'a> Response<'a> {
 
 impl<'a> BsaPayload<'a> {
     pub fn description(&self) -> &str {
-        self.description.cdata
+        &self.description.cdata
     }
 }
