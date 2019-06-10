@@ -301,13 +301,13 @@ fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
     let mut card_response = String::new();
 
     for e in fare.payload() {
-        let payment_method = match e.name {
+        let payment_method = match e.fare_type() {
             "Senior/Disabled Clipper" => "Senior Disabled Clipper",
-            _ => e.name
+            e => e
         };
 
-        response.push_str(&format!("{}, paying by {}.\n", dollar_amount(e.amount), payment_method));
-        card_response.push_str(&format!("{}: ${}\n", e.name, e.amount));
+        response.push_str(&format!("{}, paying by {}.\n", dollar_amount(&e.amount()), payment_method));
+        card_response.push_str(&format!("{}: ${}\n", e.fare_type(), e.amount()));
     }
 
     response_buffer.push_str(&response);

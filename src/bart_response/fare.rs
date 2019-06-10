@@ -1,110 +1,95 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Response<'a> {
-    #[serde(borrow)]
+pub struct Response {
     #[serde(rename = "?xml")]
-    xml: Xml<'a>,
+    xml: Xml,
 
-    #[serde(borrow)]
-    pub root: Root<'a>
+    root: Root
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Xml<'a> {
-    #[serde(borrow)]
+struct Xml {
     #[serde(rename = "@version")]
-    version: &'a str,
+    version: String,
 
-    #[serde(borrow)]
     #[serde(rename = "@encoding")]
-    encoding: &'a str
+    encoding: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Msg {
-
+struct Msg {
     #[serde(rename = "#cdata-section")]
     pub cdata: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Root<'a> {
-
+struct Root {
     uri: Msg,
 
-    #[serde(borrow)]
-    origin: &'a str,
+    origin: String,
 
-    #[serde(borrow)]
-    destination: &'a str,
+    destination: String,
 
-    #[serde(borrow)]
-    sched_num: &'a str,
+    sched_num: String,
 
-    #[serde(borrow)]
-    trip: Trip<'a>,
+    trip: Trip,
 
-    #[serde(borrow)]
     #[serde(rename = "fares")]
-    pub fares: Fares<'a>,
+    fares: Fares,
 
     message: Message
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Fares<'a> {
-
-    #[serde(borrow)]
+struct Fares {
     #[serde(rename = "@level")]
-    level: &'a str,
+    level: String,
 
-    #[serde(borrow)]
     #[serde(rename = "fare")]
-    pub payload: Vec<FarePayLoad<'a>>
+    payload: Vec<FarePayLoad>
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct FarePayLoad<'a> {
-
-    #[serde(borrow)]
+pub struct FarePayLoad {
     #[serde(rename = "@amount")]
-    pub amount: &'a str,
+    amount: String,
 
-    #[serde(borrow)]
     #[serde(rename = "@class")]
-    class: &'a str,
+    class: String,
 
-    #[serde(borrow)]
     #[serde(rename = "@name")]
-    pub name: &'a str
+    name: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Trip<'a> {
-
-    #[serde(borrow)]
-    fare: &'a str,
-
-    #[serde(borrow)]
-    discount: Discount<'a>
+struct Trip {
+    fare: String,
+    discount: Discount
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Discount<'a> {
-
-    #[serde(borrow)]
-    clipper: &'a str
+struct Discount {
+    clipper: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Message {
-
+struct Message {
     co2_emissions: Msg
 }
 
-impl<'a> Response<'a> {
+impl Response {
     pub fn payload(&self) -> &Vec<FarePayLoad> {
         &self.root.fares.payload
+    }
+}
+
+impl FarePayLoad {
+    pub fn fare_type(&self) -> &str {
+        &self.name
+    }
+
+    pub fn amount(&self) -> &str {
+        &self.amount
     }
 }

@@ -1,24 +1,20 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Response<'a> {
-    #[serde(borrow)]
+pub struct Response {
     #[serde(rename = "?xml")]
-    xml: Xml<'a>,
+    xml: Xml,
 
-    #[serde(borrow)]
-    root: Root<'a>
+    root: Root
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct Xml<'a> {
-    #[serde(borrow)]
+struct Xml {
     #[serde(rename = "@version")]
-    version: &'a str,
+    version: String,
 
-    #[serde(borrow)]
     #[serde(rename = "@encoding")]
-    encoding: &'a str
+    encoding: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -28,58 +24,48 @@ struct Msg {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct BsaPayload<'a> {
-    #[serde(borrow)]
+pub struct BsaPayload {
     #[serde(rename = "@id")]
-    id: Option<&'a str>,
+    id: Option<String>,
 
-    #[serde(borrow)]
-    station: &'a str,
+    station: String,
 
-    #[serde(borrow)]
     #[serde(rename = "type")]
-    advisory_type: Option<&'a str>,
+    advisory_type: Option<String>,
 
     description: Msg,
 
     sms_text: Msg,
 
-    #[serde(borrow)]
-    posted: Option<&'a str>,
+    posted: Option<String>,
 
-    #[serde(borrow)]
-    expires: Option<&'a str>
+    expires: Option<String>
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct Root<'a> {
-    #[serde(borrow)]
+struct Root {
     #[serde(rename = "@id")]
-    id: &'a str,
+    id: String,
 
     uri: Msg,
 
-    #[serde(borrow)]
-    date: &'a str,
+    date: String,
 
-    #[serde(borrow)]
-    time: &'a str,
+    time: String,
 
-    #[serde(borrow)]
     #[serde(rename = "bsa")]
-    payload: Vec<BsaPayload<'a>>,
+    payload: Vec<BsaPayload>,
 
-    #[serde(borrow)]
-    message: &'a str
+    message: String
 }
 
-impl<'a> Response<'a> {
+impl Response {
     pub fn payload(&self) -> &Vec<BsaPayload> {
         &self.root.payload
     }
 }
 
-impl<'a> BsaPayload<'a> {
+impl BsaPayload {
     pub fn description(&self) -> &str {
         &self.description.cdata
     }
