@@ -138,7 +138,7 @@ fn bart_connection_err_msg() -> Response {
 fn http_get(url: &str) -> std::result::Result<String, BartError> {
     let mut response = match reqwest::get(url){
         Ok(r) => r,
-        Err(_) => return Err(BartError::NoConnection)
+        Err(e) => return Err(BartError::NoConnection(e.to_string()))
     };
 
     Ok(response.text().unwrap())
@@ -176,7 +176,7 @@ fn get_advisory(_req: &Request) -> std::result::Result<Response, BartError> {
     let s = &payload_text[..];
     let bsa: bart_response::bsa::Response = match serde_json::from_str(s) {
         Ok(response) => response,
-        Err(_) => return Err(BartError::BadParse)
+        Err(e) => return Err(BartError::BadParse(e.to_string()))
     };
 
     let mut response_buffer = String::new();
@@ -293,7 +293,7 @@ fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
     let s= &payload_text[..];
     let fare: bart_response::fare::Response = match serde_json::from_str(s) {
         Ok(response) => response,
-        Err(_) => return Err(BartError::BadParse)
+        Err(e) => return Err(BartError::BadParse(e.to_string()))
     };
 
     let mut response_buffer = String::new();
@@ -350,7 +350,7 @@ fn handler(req: Value, _ctx: Context) -> std::result::Result<Response, HandlerEr
     match result {
         Ok(response) => Ok(response),
         Err(InvalidStation(station)) => Ok(invalid_key(&station)),
-        Err(NoConnection) => Ok(bart_connection_err_msg()),
+        Err(NoConnection(_)) => Ok(bart_connection_err_msg()),
         Err(e) => Err(HandlerError::new(e))
     }
 }

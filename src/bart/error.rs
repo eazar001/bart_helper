@@ -7,9 +7,9 @@ use BartError::*;
 
 #[derive(Debug)]
 pub enum BartError {
-    NoConnection,
+    NoConnection(String),
     InvalidStation(String),
-    BadParse,
+    BadParse(String),
     BadPriceConversion,
     BadCalculation,
     MissingSlot,
@@ -21,7 +21,9 @@ pub enum BartError {
 impl Display for BartError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
-            InvalidStation(s) => write!(f, "{:?} is an invalid station", s),
+            InvalidStation(e) => write!(f, "{:?} is an invalid station", e),
+            BadParse(e) => write!(f, "Bad parse error: {:?}", e),
+            NoConnection(e) => write!(f, "Network connection error: {:?}", e),
             _ => write!(f, "{:?}", self)
         }
     }
@@ -32,9 +34,9 @@ impl Error for BartError { }
 impl LambdaErrorExt for BartError {
     fn error_type(&self) -> &str {
         match self {
-            NoConnection => "bart::error::NoConnection",
+            NoConnection(_) => "bart::error::NoConnection",
             InvalidStation(_) => "bart::error::InvalidStation",
-            BadParse => "bart::error::BadParse",
+            BadParse(_) => "bart::error::BadParse",
             BadPriceConversion => "bart::error::BadPriceConversion",
             BadCalculation => "bart::error::BadCalculation",
             MissingSlot => "bart::error::MissingSlot",
