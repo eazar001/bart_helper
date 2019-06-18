@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Response {
     #[serde(rename = "?xml")]
     xml: Xml,
-
     root: Root
 }
 
@@ -12,7 +11,6 @@ pub struct Response {
 struct Xml {
     #[serde(rename = "@version")]
     version: String,
-
     #[serde(rename = "@encoding")]
     encoding: String
 }
@@ -27,18 +25,12 @@ struct Msg {
 pub struct BsaPayload {
     #[serde(rename = "@id")]
     id: Option<String>,
-
     station: String,
-
     #[serde(rename = "type")]
     advisory_type: Option<String>,
-
     description: Msg,
-
     sms_text: Msg,
-
     posted: Option<String>,
-
     expires: Option<String>
 }
 
@@ -46,16 +38,11 @@ pub struct BsaPayload {
 struct Root {
     #[serde(rename = "@id")]
     id: String,
-
     uri: Msg,
-
     date: String,
-
     time: String,
-
     #[serde(rename = "bsa")]
     payload: Vec<BsaPayload>,
-
     message: String
 }
 

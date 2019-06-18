@@ -162,7 +162,7 @@ fn get_help(_req: &Request) -> std::result::Result<Response, BartError> {
             <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for the fare from West Oakland \
             to Richmond, or Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for \
             the fare from South San Francisco to Lake Merritt. To avoid confusion, try to \
-            prounounce the station names clearly.</speak>"
+            pronounce the station names clearly.</speak>"
         ));
 
     Ok(response)

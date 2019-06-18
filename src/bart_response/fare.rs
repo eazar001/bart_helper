@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Response {
     #[serde(rename = "?xml")]
     xml: Xml,
-
     root: Root
 }
 
@@ -12,7 +11,6 @@ pub struct Response {
 struct Xml {
     #[serde(rename = "@version")]
     version: String,
-
     #[serde(rename = "@encoding")]
     encoding: String
 }
@@ -26,18 +24,12 @@ struct Msg {
 #[derive(Deserialize, Serialize, Debug)]
 struct Root {
     uri: Msg,
-
     origin: String,
-
     destination: String,
-
     sched_num: String,
-
     trip: Trip,
-
     #[serde(rename = "fares")]
     fares: Fares,
-
     message: Message
 }
 
@@ -45,7 +37,6 @@ struct Root {
 struct Fares {
     #[serde(rename = "@level")]
     level: String,
-
     #[serde(rename = "fare")]
     payload: Vec<FarePayLoad>
 }
@@ -54,10 +45,8 @@ struct Fares {
 pub struct FarePayLoad {
     #[serde(rename = "@amount")]
     amount: String,
-
     #[serde(rename = "@class")]
     class: String,
-
     #[serde(rename = "@name")]
     name: String
 }

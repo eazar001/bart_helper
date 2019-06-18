@@ -3,7 +3,7 @@
   "response": {
     "outputSpeech": {
       "type": "SSML",
-      "ssml": "<speak>To get information about <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> service advisories and alerts, say: Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for updates. To inquire about fares between stations say a command such as: Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for the fare from West Oakland to Richmond, or Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for the fare from South San Francisco to Lake Merritt. To avoid confusion, try to prounounce the station names clearly.</speak>"
+      "ssml": "<speak>To get information about <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> service advisories and alerts, say: Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for updates. To inquire about fares between stations say a command such as: Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for the fare from West Oakland to Richmond, or Alexa, ask <phoneme alphabet='ipa' ph='bɑɹt'>BART</phoneme> helper for the fare from South San Francisco to Lake Merritt. To avoid confusion, try to pronounce the station names clearly.</speak>"
     },
     "card": {
       "type": "Simple",
