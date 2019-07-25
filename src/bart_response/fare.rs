@@ -30,7 +30,7 @@ struct Root {
     trip: Trip,
     #[serde(rename = "fares")]
     fares: Fares,
-    message: Message
+    message: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
