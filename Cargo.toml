@@ -1,6 +1,6 @@
 [package]
 name = "bart_info"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Ebrahim Azarisooreh <ebrahim.azarisooreh@gmail.com>"]
 edition = "2018"
 
@@ -10,7 +10,6 @@ lambda_runtime = "0.2.0"
 reqwest = "0.9.16"
 serde = { version = "1.0.91", features = ["derive"] }
 serde_json = "1.0.39"
-regex = "1.1.6"
 lazy_static = "1.3.0"
 # Add openssl-sys as a direct dependency so it can be cross compiled to
 # x86_64-unknown-linux-musl using the "vendored" feature below

@@ -8,7 +8,6 @@ use alexa_sdk::response::{Speech, Card};
 use alexa_sdk::request::{IntentType};
 use std::error::Error;
 use std::collections::HashMap;
-use regex::Regex;
 use lazy_static::lazy_static;
 use bart::error::BartError;
 use bart::error::BartError::{InvalidStation, NoConnection};
@@ -70,6 +69,7 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("coma", "colm"),
     ("concord", "conc"),
     ("daly city", "daly"),
+    ("daily city", "daly"),
     ("downtown berkeley", "dbrk"),
     ("dublin pleasanton", "dubl"),
     ("east dublin", "dubl"),
@@ -105,6 +105,7 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("powell", "powl"),
     ("richmond", "rich"),
     ("rockridge", "rock"),
+    ("rock ridge", "rock"),
     ("san bruno", "sbrn"),
     ("san francisco international airport", "sfia"),
     ("san francisco airport", "sfia"),
@@ -269,8 +270,6 @@ fn get_station(station: &str) -> std::result::Result<&str, BartError> {
 }
 
 fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
-    let daily_re = Regex::new(r"(daily) ").unwrap();
-
     let origin_lower = req.slot_value("origin")
         .map(|c| c.to_lowercase())
         .unwrap();
@@ -279,11 +278,8 @@ fn get_fare(req: &Request) -> std::result::Result<Response, BartError> {
         .map(|c| c.to_lowercase())
         .unwrap();
 
-    let origin_key = daily_re.replace_all(&origin_lower, "daly ");
-    let dest_key = daily_re.replace_all(&dest_lower, "daly ");
-
-    let origin = get_station(&origin_key[..])?;
-    let dest = get_station(&dest_key[..])?;
+    let origin = get_station(&origin_lower)?;
+    let dest = get_station(&dest_lower)?;
 
     let url = format!("https://api.bart.gov/api/sched.aspx?cmd=fare&\
         orig={}&dest={}&date=today&key=MW9S-E7SL-26DU-VV8V&json=y", origin, dest);
