@@ -105,6 +105,8 @@ fn stations() -> HashMap<&'static str, &'static str> {[
     ("powell", "powl"),
     ("richmond", "rich"),
     ("rockridge", "rock"),
+    ("rockbridge", "rock"),
+    ("rock bridge", "rock"),
     ("rock ridge", "rock"),
     ("san bruno", "sbrn"),
     ("san francisco international airport", "sfia"),
