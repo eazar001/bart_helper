@@ -26,7 +26,6 @@ struct Root {
     uri: Msg,
     origin: String,
     destination: String,
-    sched_num: String,
     trip: Trip,
     #[serde(rename = "fares")]
     fares: Fares,

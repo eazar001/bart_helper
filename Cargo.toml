@@ -1,6 +1,6 @@
 [package]
 name = "bart_info"
-version = "1.0.2"
+version = "1.0.3"
 authors = ["Ebrahim Azarisooreh <ebrahim.azarisooreh@gmail.com>"]
 edition = "2018"
 

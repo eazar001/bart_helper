@@ -65,7 +65,7 @@ dependencies = [
 
 [[package]]
 name = "bart_info"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "alexa_sdk 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "lambda_runtime 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
