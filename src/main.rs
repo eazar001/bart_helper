@@ -404,9 +404,9 @@ mod tests {
     }
 
     #[test]
-    fn test_fare_colma_concord_request() {
-        test_request("fare_colma_concord_request.json")
-    }
+    //fn test_fare_colma_concord_request() {
+        //test_request("fare_colma_concord_request.json")
+    //}
 
     #[test]
     fn test_service_advisory() {
